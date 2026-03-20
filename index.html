@@ -7,34 +7,110 @@
 <style>
 body {
   text-align: center;
-  font-family: Arial;
   background: #111;
   color: white;
-}
-
-textarea {
-  width: 250px;
-  height: 100px;
-}
-
-button {
-  margin: 10px;
-  padding: 10px;
+  font-family: Arial;
 }
 
 canvas {
   border-radius: 50%;
   border: 5px solid white;
 }
+
+button {
+  padding: 10px;
+  margin: 10px;
+}
+
+#arrow {
+  font-size: 30px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>🎉 Salami Wheel 🎉</h2>
+<h2>🎉 Jubayer Eid Salam 🎉</h2>
+<div id="arrow">⬇️</div>
 
-<p>Items (one per line):</p>
-<textarea id="data"></textarea><br>
+<button id="spinBtn" onclick="spin()">🎯 Spin</button>
+<h3 id="result"></h3>
+
+<canvas id="wheel" width="300" height="300"></canvas>
+
+<script>
+let options = [
+ "5 Taka","10 Taka","12 Taka","15 Taka",
+ "15.5 Taka","2.5 Taka","6 Taka","20 Taka",
+ "18 Taka","23 Taka","25 Taka","28 Taka",
+ "10 Taka","8 Taka","50 Taka"
+];
+
+let colors = ["#3369E8","#D50F25","#EEB211","#009925"];
+
+let hasSpun = localStorage.getItem("spun");
+
+function drawWheel(){
+ let canvas = document.getElementById("wheel");
+ let ctx = canvas.getContext("2d");
+
+ let arc = Math.PI * 2 / options.length;
+
+ for(let i=0;i<options.length;i++){
+   let angle = i * arc;
+
+   ctx.beginPath();
+   ctx.fillStyle = colors[i % colors.length];
+   ctx.moveTo(150,150);
+   ctx.arc(150,150,150,angle,angle+arc);
+   ctx.fill();
+
+   ctx.save();
+   ctx.fillStyle = "white";
+   ctx.translate(150,150);
+   ctx.rotate(angle + arc/2);
+   ctx.fillText(options[i], 70, 5);
+   ctx.restore();
+ }
+}
+
+let rotation = 0;
+
+function spin(){
+ if(localStorage.getItem("spun")){
+   alert("❌ Already spun!");
+   return;
+ }
+
+ let rand = Math.floor(Math.random()*options.length);
+ let deg = 360/options.length;
+
+ let spinDeg = 3600 + (rand * deg);
+ rotation += spinDeg;
+
+ document.getElementById("wheel").style.transform =
+   "rotate("+rotation+"deg)";
+
+ setTimeout(()=>{
+   let result = options[rand];
+   document.getElementById("result").innerText = "🎉 " + result;
+
+   localStorage.setItem("spun","yes");
+   document.getElementById("spinBtn").disabled = true;
+
+ },4000);
+}
+
+if(hasSpun){
+ document.getElementById("spinBtn").disabled = true;
+ document.getElementById("result").innerText = "❌ Already Spun!";
+}
+
+drawWheel();
+</script>
+
+</body>
+</html><textarea id="data"></textarea><br>
 
 <button onclick="generateLink()">🔗 Generate Link</button>
 <button onclick="spin()">🎯 Spin</button>
