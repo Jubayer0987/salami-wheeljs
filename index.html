@@ -12,6 +12,10 @@ body {
   font-family: Arial;
 }
 
+h2 {
+  margin-top: 20px;
+}
+
 .container {
   position: relative;
   display: inline-block;
@@ -22,6 +26,7 @@ body {
   border-radius: 50%;
   border: 6px solid white;
   transition: transform 4s ease-out;
+  image-rendering: optimizeQuality;
 }
 
 #spinBtn {
@@ -29,11 +34,12 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 12px 20px;
+  padding: 14px 20px;
   border-radius: 50%;
   border: none;
   background: #ff4757;
   color: white;
+  font-size: 16px;
   cursor: pointer;
 }
 
@@ -44,6 +50,13 @@ body {
 #result {
   margin-top: 15px;
   font-size: 20px;
+  font-weight: bold;
+}
+
+#mode {
+  margin-top: 5px;
+  font-size: 14px;
+  opacity: 0.8;
 }
 </style>
 </head>
@@ -54,12 +67,13 @@ body {
 <p id="mode"></p>
 
 <div class="container">
-  <canvas id="wheel" width="320" height="320"></canvas>
+  <canvas id="wheel"></canvas>
   <button id="spinBtn" onclick="spin()">SPIN</button>
 </div>
 
 <h3 id="result"></h3>
 
+<!-- SOUND -->
 <audio id="spinSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
 <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
 
@@ -74,7 +88,7 @@ let options = [
 let colors = ["#ff4757","#1e90ff","#2ed573","#ffa502"];
 let rotation = 0;
 
-// 🔐 CHECK ADMIN MODE
+// 🔐 ADMIN MODE
 let params = new URLSearchParams(window.location.search);
 let isAdmin = params.get("admin") === "true";
 
@@ -84,35 +98,52 @@ if(isAdmin){
  document.getElementById("mode").innerText = "👤 User Mode";
 }
 
-// DRAW
+// 🎨 DRAW WHEEL (SHARP TEXT)
 function drawWheel(){
  let canvas = document.getElementById("wheel");
  let ctx = canvas.getContext("2d");
+
+ let size = 320;
+ let scale = window.devicePixelRatio;
+
+ canvas.width = size * scale;
+ canvas.height = size * scale;
+ canvas.style.width = size + "px";
+ canvas.style.height = size + "px";
+
+ ctx.scale(scale, scale);
+
  let arc = Math.PI * 2 / options.length;
+
+ ctx.clearRect(0,0,size,size);
 
  for(let i=0;i<options.length;i++){
    let angle = i * arc;
 
+   // slice
    ctx.beginPath();
    ctx.fillStyle = colors[i % colors.length];
-   ctx.moveTo(160,160);
-   ctx.arc(160,160,160,angle,angle+arc);
+   ctx.moveTo(size/2,size/2);
+   ctx.arc(size/2,size/2,size/2,angle,angle+arc);
    ctx.fill();
 
+   // TEXT (CRYSTAL CLEAR)
    ctx.save();
    ctx.fillStyle = "#fff";
-   ctx.font = "bold 14px Arial";
+   ctx.font = "bold 15px Arial";
    ctx.textAlign = "center";
+   ctx.textBaseline = "middle";
 
-   ctx.translate(160,160);
+   ctx.translate(size/2,size/2);
    ctx.rotate(angle + arc/2);
-   ctx.fillText(options[i], 100, 5);
+
+   ctx.fillText(options[i], size/3, 0);
 
    ctx.restore();
  }
 }
 
-// SPIN
+// 🎯 SPIN
 function spin(){
  if(!isAdmin && localStorage.getItem("spun")){
    alert("❌ Already spun!");
@@ -135,7 +166,7 @@ function spin(){
    document.getElementById("winSound").play();
 
    let result = options[rand];
-   document.getElementById("result").innerText = "🎉 " + result;
+   document.getElementById("result").innerText = "🎉 You got: " + result;
 
    if(!isAdmin){
      localStorage.setItem("spun","yes");
@@ -145,7 +176,7 @@ function spin(){
  },4000);
 }
 
-// LOCK for users only
+// 🔒 LOCK USER
 if(!isAdmin && localStorage.getItem("spun")){
  document.getElementById("spinBtn").disabled = true;
  document.getElementById("result").innerText = "❌ Already Spun!";
