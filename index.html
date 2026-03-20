@@ -48,7 +48,7 @@ let options = [
 
 let colors = ["#3369E8","#D50F25","#EEB211","#009925"];
 
-let hasSpun = localStorage.getItem("spun");
+let rotation = 0;
 
 function drawWheel(){
  let canvas = document.getElementById("wheel");
@@ -73,8 +73,6 @@ function drawWheel(){
    ctx.restore();
  }
 }
-
-let rotation = 0;
 
 function spin(){
  if(localStorage.getItem("spun")){
@@ -101,147 +99,11 @@ function spin(){
  },4000);
 }
 
-if(hasSpun){
+if(localStorage.getItem("spun")){
  document.getElementById("spinBtn").disabled = true;
  document.getElementById("result").innerText = "❌ Already Spun!";
 }
 
-drawWheel();
-</script>
-
-</body>
-</html><textarea id="data"></textarea><br>
-
-<button onclick="generateLink()">🔗 Generate Link</button>
-<button onclick="spin()">🎯 Spin</button>
-
-<br><br>
-<canvas id="wheel" width="300" height="300"></canvas>
-
-<script>
-let options = [];
-
-function loadFromURL(){
-  let params = new URLSearchParams(window.location.search);
-  let data = params.get("data");
-  if(data){
-    options = data.split(",");
-    document.getElementById("data").value = options.join("\n");
-  }
-}
-
-function generateLink(){
-  let text = document.getElementById("data").value;
-  let arr = text.split("\n");
-  let encoded = encodeURIComponent(arr.join(","));
-  let link = window.location.origin + window.location.pathname + "?data=" + encoded;
-  
-  prompt("Copy this link:", link);
-}
-
-let startAngle = 0;
-
-function drawWheel(){
-  let canvas = document.getElementById("wheel");
-  let ctx = canvas.getContext("2d");
-  let arc = Math.PI * 2 / options.length;
-
-  for(let i=0;i<options.length;i++){
-    let angle = startAngle + i * arc;
-    ctx.beginPath();
-    ctx.fillStyle = i % 2 == 0 ? "red" : "green";
-    ctx.moveTo(150,150);
-    ctx.arc(150,150,150,angle,angle+arc);
-    ctx.fill();
-
-    ctx.save();
-    ctx.fillStyle = "white";
-    ctx.translate(150,150);
-    ctx.rotate(angle + arc/2);
-    ctx.fillText(options[i], 70, 5);
-    ctx.restore();
-  }
-}
-
-function spin(){
-  if(options.length == 0){
-    alert("Enter items first!");
-    return;
-  }
-
-  let rand = Math.floor(Math.random() * options.length);
-  alert("🎉 You got: " + options[rand]);
-}
-
-loadFromURL();
-drawWheel();
-</script>
-
-</body>
-</html><textarea id="data"></textarea><br>
-
-<button onclick="generateLink()">🔗 Generate Link</button>
-<button onclick="spin()">🎯 Spin</button>
-
-<br><br>
-<canvas id="wheel" width="300" height="300"></canvas>
-
-<script>
-let options = [];
-
-function loadFromURL(){
-  let params = new URLSearchParams(window.location.search);
-  let data = params.get("data");
-  if(data){
-    options = data.split(",");
-    document.getElementById("data").value = options.join("\n");
-  }
-}
-
-function generateLink(){
-  let text = document.getElementById("data").value;
-  let arr = text.split("\n");
-  let encoded = encodeURIComponent(arr.join(","));
-  let link = window.location.origin + window.location.pathname + "?data=" + encoded;
-  
-  prompt("Copy this link:", link);
-}
-
-let startAngle = 0;
-
-function drawWheel(){
-  let canvas = document.getElementById("wheel");
-  let ctx = canvas.getContext("2d");
-  let arc = Math.PI * 2 / options.length;
-
-  for(let i=0;i<options.length;i++){
-    let angle = startAngle + i * arc;
-    ctx.beginPath();
-    ctx.fillStyle = i % 2 == 0 ? "red" : "green";
-    ctx.moveTo(150,150);
-    ctx.arc(150,150,150,angle,angle+arc);
-    ctx.fill();
-
-    ctx.save();
-    ctx.fillStyle = "white";
-    ctx.translate(150,150);
-    ctx.rotate(angle + arc/2);
-    ctx.fillText(options[i], 70, 5);
-    ctx.restore();
-  }
-}
-
-function spin(){
-  if(options.length == 0){
-    alert("Enter items first!");
-    return;
-  }
-
-  let rand = Math.floor(Math.random() * options.length);
-  alert("🎉 You got: " + options[rand]);
-}
-
-loadFromURL();
 drawWheel();
 </script>
 
