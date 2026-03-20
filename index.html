@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Salami Wheel 🎉</title>
+
+<style>
+body {
+  text-align: center;
+  font-family: Arial;
+  background: #111;
+  color: white;
+}
+
+textarea {
+  width: 250px;
+  height: 100px;
+}
+
+button {
+  margin: 10px;
+  padding: 10px;
+}
+
+canvas {
+  border-radius: 50%;
+  border: 5px solid white;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🎉 Salami Wheel 🎉</h2>
+
+<p>Items (one per line):</p>
+<textarea id="data"></textarea><br>
+
+<button onclick="generateLink()">🔗 Generate Link</button>
+<button onclick="spin()">🎯 Spin</button>
+
+<br><br>
+<canvas id="wheel" width="300" height="300"></canvas>
+
+<script>
+let options = [];
+
+function loadFromURL(){
+  let params = new URLSearchParams(window.location.search);
+  let data = params.get("data");
+  if(data){
+    options = data.split(",");
+    document.getElementById("data").value = options.join("\n");
+  }
+}
+
+function generateLink(){
+  let text = document.getElementById("data").value;
+  let arr = text.split("\n");
+  let encoded = encodeURIComponent(arr.join(","));
+  let link = window.location.origin + window.location.pathname + "?data=" + encoded;
+  
+  prompt("Copy this link:", link);
+}
+
+let startAngle = 0;
+
+function drawWheel(){
+  let canvas = document.getElementById("wheel");
+  let ctx = canvas.getContext("2d");
+  let arc = Math.PI * 2 / options.length;
+
+  for(let i=0;i<options.length;i++){
+    let angle = startAngle + i * arc;
+    ctx.beginPath();
+    ctx.fillStyle = i % 2 == 0 ? "red" : "green";
+    ctx.moveTo(150,150);
+    ctx.arc(150,150,150,angle,angle+arc);
+    ctx.fill();
+
+    ctx.save();
+    ctx.fillStyle = "white";
+    ctx.translate(150,150);
+    ctx.rotate(angle + arc/2);
+    ctx.fillText(options[i], 70, 5);
+    ctx.restore();
+  }
+}
+
+function spin(){
+  if(options.length == 0){
+    alert("Enter items first!");
+    return;
+  }
+
+  let rand = Math.floor(Math.random() * options.length);
+  alert("🎉 You got: " + options[rand]);
+}
+
+loadFromURL();
+drawWheel();
+</script>
+
+</body>
+</html>
