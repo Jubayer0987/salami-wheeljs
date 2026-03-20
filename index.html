@@ -12,10 +12,6 @@ body {
   font-family: Arial;
 }
 
-h2 {
-  margin-top: 20px;
-}
-
 .container {
   position: relative;
   display: inline-block;
@@ -26,7 +22,6 @@ h2 {
   border-radius: 50%;
   border: 6px solid white;
   transition: transform 4s ease-out;
-  image-rendering: optimizeQuality;
 }
 
 #spinBtn {
@@ -39,7 +34,6 @@ h2 {
   border: none;
   background: #ff4757;
   color: white;
-  font-size: 16px;
   cursor: pointer;
 }
 
@@ -51,12 +45,6 @@ h2 {
   margin-top: 15px;
   font-size: 20px;
   font-weight: bold;
-}
-
-#mode {
-  margin-top: 5px;
-  font-size: 14px;
-  opacity: 0.8;
 }
 </style>
 </head>
@@ -78,11 +66,15 @@ h2 {
 <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
 
 <script>
+// 🎯 PROBABILITY SYSTEM
 let options = [
- "5 Taka","10 Taka","12 Taka","15 Taka",
- "15.5 Taka","2.5 Taka","6 Taka","20 Taka",
- "18 Taka","23 Taka","25 Taka","28 Taka",
- "10 Taka","8 Taka","50 Taka"
+ "10 Taka","20 Taka","30 Taka","40 Taka","50 Taka",
+ "60 Taka","70 Taka","80 Taka","90 Taka",
+
+ "10 Taka","20 Taka","30 Taka","40 Taka","50 Taka",
+ "60 Taka","70 Taka","20 Taka","30 Taka","10 Taka",
+
+ "100 Taka" // 🎁 5% chance
 ];
 
 let colors = ["#ff4757","#1e90ff","#2ed573","#ffa502"];
@@ -92,13 +84,10 @@ let rotation = 0;
 let params = new URLSearchParams(window.location.search);
 let isAdmin = params.get("admin") === "true";
 
-if(isAdmin){
- document.getElementById("mode").innerText = "🟢 Admin Mode";
-}else{
- document.getElementById("mode").innerText = "👤 User Mode";
-}
+document.getElementById("mode").innerText =
+  isAdmin ? "🟢 Admin Mode" : "👤 User Mode";
 
-// 🎨 DRAW WHEEL (SHARP TEXT)
+// 🎨 DRAW (HD TEXT)
 function drawWheel(){
  let canvas = document.getElementById("wheel");
  let ctx = canvas.getContext("2d");
@@ -115,19 +104,15 @@ function drawWheel(){
 
  let arc = Math.PI * 2 / options.length;
 
- ctx.clearRect(0,0,size,size);
-
  for(let i=0;i<options.length;i++){
    let angle = i * arc;
 
-   // slice
    ctx.beginPath();
    ctx.fillStyle = colors[i % colors.length];
    ctx.moveTo(size/2,size/2);
    ctx.arc(size/2,size/2,size/2,angle,angle+arc);
    ctx.fill();
 
-   // TEXT (CRYSTAL CLEAR)
    ctx.save();
    ctx.fillStyle = "#fff";
    ctx.font = "bold 15px Arial";
@@ -167,6 +152,11 @@ function spin(){
 
    let result = options[rand];
    document.getElementById("result").innerText = "🎉 You got: " + result;
+
+   // 🎁 SPECIAL EFFECT for 100
+   if(result === "100 Taka"){
+     document.getElementById("result").innerText += " 🤑 JACKPOT!";
+   }
 
    if(!isAdmin){
      localStorage.setItem("spun","yes");
