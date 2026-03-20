@@ -12,8 +12,10 @@ body {
   font-family: Arial;
 }
 
-h2 {
-  margin-top: 20px;
+.container {
+  position: relative;
+  display: inline-block;
+  margin-top: 30px;
 }
 
 #wheel {
@@ -32,18 +34,11 @@ h2 {
   border: none;
   background: #ff4757;
   color: white;
-  font-size: 16px;
   cursor: pointer;
 }
 
-.container {
-  position: relative;
-  display: inline-block;
-  margin-top: 30px;
-}
-
-#arrow {
-  font-size: 30px;
+#spinBtn:disabled {
+  background: gray;
 }
 
 #result {
@@ -56,16 +51,15 @@ h2 {
 <body>
 
 <h2>🎉 Jubayer Eid Salam 🎉</h2>
-<div id="arrow">⬇️</div>
+<p id="mode"></p>
 
 <div class="container">
-  <canvas id="wheel" width="300" height="300"></canvas>
+  <canvas id="wheel" width="320" height="320"></canvas>
   <button id="spinBtn" onclick="spin()">SPIN</button>
 </div>
 
 <h3 id="result"></h3>
 
-<!-- Sound -->
 <audio id="spinSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
 <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-8.mp3"></audio>
 
@@ -80,10 +74,20 @@ let options = [
 let colors = ["#ff4757","#1e90ff","#2ed573","#ffa502"];
 let rotation = 0;
 
+// 🔐 CHECK ADMIN MODE
+let params = new URLSearchParams(window.location.search);
+let isAdmin = params.get("admin") === "true";
+
+if(isAdmin){
+ document.getElementById("mode").innerText = "🟢 Admin Mode";
+}else{
+ document.getElementById("mode").innerText = "👤 User Mode";
+}
+
+// DRAW
 function drawWheel(){
  let canvas = document.getElementById("wheel");
  let ctx = canvas.getContext("2d");
-
  let arc = Math.PI * 2 / options.length;
 
  for(let i=0;i<options.length;i++){
@@ -91,29 +95,31 @@ function drawWheel(){
 
    ctx.beginPath();
    ctx.fillStyle = colors[i % colors.length];
-   ctx.moveTo(150,150);
-   ctx.arc(150,150,150,angle,angle+arc);
+   ctx.moveTo(160,160);
+   ctx.arc(160,160,160,angle,angle+arc);
    ctx.fill();
 
    ctx.save();
-   ctx.fillStyle = "white";
-   ctx.translate(150,150);
+   ctx.fillStyle = "#fff";
+   ctx.font = "bold 14px Arial";
+   ctx.textAlign = "center";
+
+   ctx.translate(160,160);
    ctx.rotate(angle + arc/2);
-   ctx.fillText(options[i], 70, 5);
+   ctx.fillText(options[i], 100, 5);
+
    ctx.restore();
  }
 }
 
+// SPIN
 function spin(){
- if(localStorage.getItem("spun")){
+ if(!isAdmin && localStorage.getItem("spun")){
    alert("❌ Already spun!");
    return;
  }
 
- let spinSound = document.getElementById("spinSound");
- let winSound = document.getElementById("winSound");
-
- spinSound.play();
+ document.getElementById("spinSound").play();
 
  let rand = Math.floor(Math.random()*options.length);
  let deg = 360/options.length;
@@ -125,19 +131,22 @@ function spin(){
    "rotate("+rotation+"deg)";
 
  setTimeout(()=>{
-   spinSound.pause();
-   winSound.play();
+   document.getElementById("spinSound").pause();
+   document.getElementById("winSound").play();
 
    let result = options[rand];
-   document.getElementById("result").innerText = "🎉 You got: " + result;
+   document.getElementById("result").innerText = "🎉 " + result;
 
-   localStorage.setItem("spun","yes");
-   document.getElementById("spinBtn").disabled = true;
+   if(!isAdmin){
+     localStorage.setItem("spun","yes");
+     document.getElementById("spinBtn").disabled = true;
+   }
 
  },4000);
 }
 
-if(localStorage.getItem("spun")){
+// LOCK for users only
+if(!isAdmin && localStorage.getItem("spun")){
  document.getElementById("spinBtn").disabled = true;
  document.getElementById("result").innerText = "❌ Already Spun!";
 }
